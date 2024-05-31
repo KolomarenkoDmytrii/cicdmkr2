@@ -33,19 +33,15 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a makemigrations script
-        run: docker-compose -f docker-compose.yml run web python company/manage.py makemigrations
+        run: docker-compose -f docker-compose.yml run web python manage.py makemigrations
 
       # Runs a single command using the runners shell
       - name: Run a migrate script
-        run: docker-compose -f docker-compose.yml run web python company/manage.py migrate
-  
+        run: docker-compose -f docker-compose.yml run web python manage.py migrate
+
       # Runs a single command using the runners shell
-      - name: Run a test script for main app
-        run: docker-compose -f docker-compose.yml run web python company/manage.py test main.tests
-  
-      # Runs a single command using the runners shell
-      - name: Run a test script for services app
-        run: docker-compose -f docker-compose.yml run web python company/manage.py test services.tests
+      - name: Run tests
+        run: docker-compose -f docker-compose.yml run web python manage.py test
 
   deploy:
     needs: build

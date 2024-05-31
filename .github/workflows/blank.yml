@@ -6,10 +6,10 @@ name: "Django CI/CD: Build and test"
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -41,45 +41,16 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a makemigrations script
-        run: docker-compose -f docker-compose.yml run web python company/manage.py makemigrations
+        run: docker-compose -f docker-compose.yml run web python manage.py makemigrations
 
       # Runs a single command using the runners shell
       - name: Run a migrate script
-        run: docker-compose -f docker-compose.yml run web python company/manage.py migrate
+        run: docker-compose -f docker-compose.yml run web python manage.py migrate
 
       # Runs a single command using the runners shell
-      - name: Run a test script for main app
-        run: docker-compose -f docker-compose.yml run web python company/manage.py test main.tests
-
-      # Runs a single command using the runners shell
-      - name: Run a test script for services app
-        run: docker-compose -f docker-compose.yml run web python company/manage.py test services.tests
+      - name: Run tests
+        run: docker-compose -f docker-compose.yml run web python manage.py test
 
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
-
-  automerge:
-    needs: build
-    if: ${{ success() }}
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      - name: Set Git config
-        run: |
-          git config --global user.email "<>"
-          git config --global user.name "Github Actions"
-
-      - name: Clone the repository
-        run: |
-          git clone "https://$GITHUB_ACTOR:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/KolomarenkoDmytrii/cicd_webapp_labs.git"
-
-      - name: Merge develop branch with main branch
-        run: |
-          cd cicd_webapp_labs
-          git checkout main
-          git merge origin/develop -m "Auto-merge develop to main"
-          git push origin main
