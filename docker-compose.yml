@@ -1,0 +1,21 @@
+# https://stackoverflow.com/questions/37775702/changing-a-postgres-containers-server-port-in-docker-compose
+services:
+    db:
+        image: postgres
+        volumes:
+            - ./data/db:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        ports:
+            - "5432:5432"
+    web:
+        build: .
+        command: bash -c "cd company && python manage.py test && gunicorn company.wsgi:application --bind 0.0.0.0:${PORT}"
+        volumes:
+            - .:/app
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
