@@ -3,6 +3,7 @@ from django import http
 from django.contrib import messages
 from django.views import View
 
+import random
 from .models import Category, Recipe
 
 
@@ -11,6 +12,6 @@ def main_page(request):
         request,
         "main.html",
         context={
-            "recipes": Recipe.objects.all(),
+            "recipes": random.choices(Recipe.objects.all(), k=10),
         },
     )
